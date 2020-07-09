@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -71,6 +70,10 @@ func newErrorPageData(req *http.Request, message string) errorPageData {
 	statusCode := req.Header.Get(CodeHeader)
 	statusCodeNumber, _ := strconv.Atoi(req.Header.Get(CodeHeader))
 	statusText := http.StatusText(statusCodeNumber)
+
+	if message == "" {
+		message = statusText
+	}
 
 	return errorPageData{
 		Code:    statusCode,
@@ -142,7 +145,10 @@ func HTMLResponse(w http.ResponseWriter, r *http.Request) {
 		}
 		defer f.Close()
 		log.Printf("serving custom error response for code %v and format %v from file %v", code, HTML, file)
-		io.Copy(w, f)
+		tmpl := template.Must(template.ParseFiles(f.Name(), styles.Name()))
+
+		data := newErrorPageData(r, "")
+		tmpl.Execute(w, data)
 		return
 	}
 	defer f.Close()
@@ -150,9 +156,8 @@ func HTMLResponse(w http.ResponseWriter, r *http.Request) {
 	log.Printf("serving custom error response for code %v and format %v from file %v", code, HTML, file)
 	tmpl := template.Must(template.ParseFiles(f.Name(), styles.Name()))
 
-	data := newErrorPageData(r, "Testing")
+	data := newErrorPageData(r, "")
 	tmpl.Execute(w, data)
-
 }
 
 // JSONResponse returns json reponse
@@ -160,7 +165,7 @@ func JSONResponse(w http.ResponseWriter, r *http.Request) {
 	code := getStatusCode(r)
 	w.Header().Set(ContentType, JSON)
 	w.WriteHeader(code)
-	body, _ := json.Marshal(newErrorPageData(r, "Testing"))
+	body, _ := json.Marshal(newErrorPageData(r, ""))
 	w.Write(body)
 }
 
