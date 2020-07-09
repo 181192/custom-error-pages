@@ -42,3 +42,10 @@ docker-build:
 ## docker-run: Run docker image
 docker-run: docker-build
 	docker run --rm -p 8080:8080 custom-error-pages:latest
+
+k3d-import: docker-build
+	k3d i custom-error-pages
+
+k8s-deploy: k3d-import
+	kubectl apply -k k8s/nginx-ingress
+	kubectl rollout restart deployment nginx-ingress-default-backend -n kube-system
