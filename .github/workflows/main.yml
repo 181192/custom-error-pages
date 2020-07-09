@@ -1,0 +1,15 @@
+name: Docker
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build, Tag, Push
+        uses: mattdavis0351/actions/docker-gpr@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          image-name: custom-error-pages
