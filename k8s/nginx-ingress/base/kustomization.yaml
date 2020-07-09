@@ -1,0 +1,46 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: kube-system
+commonLabels:
+  app.kubernetes.io/name: ingress-nginx
+  app.kubernetes.io/part-of: ingress-nginx
+resources:
+  - deployment.yaml
+  - role-binding.yaml
+  - role.yaml
+  - cluster-role.yaml
+  - cluster-role-binding.yaml
+  - service-account.yaml
+  - service.yaml
+images:
+  - name: quay.io/kubernetes-ingress-controller/nginx-ingress-controller
+    newTag: 0.26.1
+vars:
+  - fieldref:
+      fieldPath: metadata.name
+    name: NGINX_CONFIGMAP_NAME
+    objref:
+      apiVersion: v1
+      kind: ConfigMap
+      name: nginx-configuration
+  - fieldref:
+      fieldPath: metadata.name
+    name: SERVICE_NAME
+    objref:
+      apiVersion: v1
+      kind: Service
+      name: ingress-nginx
+configMapGenerator:
+  - name: nginx-configuration
+    literals:
+      - body-size=64m
+      - enable-vts-status="false"
+      - hsts-include-subdomains="false"
+      - proxy-body-size=10m
+      - proxy-buffer-size=16k
+      - proxy-connect-timeout="15"
+      - proxy-read-timeout="600"
+      - proxy-send-timeout="600"
+      - server-name-hash-bucket-size="256"
+generatorOptions:
+  disableNameSuffixHash: true

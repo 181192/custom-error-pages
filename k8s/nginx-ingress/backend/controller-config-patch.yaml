@@ -1,0 +1,3 @@
+- op: add
+  path: /data/custom-http-errors
+  value: 404,500,501,502,503

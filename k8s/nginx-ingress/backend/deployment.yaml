@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-ingress-default-backend
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: nginx-ingress-default-backend
+          image: custom-error-pages:latest
+          imagePullPolicy: Never
+          securityContext:
+            runAsUser: 65534
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+      serviceAccountName: nginx-ingress-serviceaccount
+      terminationGracePeriodSeconds: 60

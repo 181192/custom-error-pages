@@ -1,0 +1,11 @@
+- op: add
+  path: /spec/template/spec/containers/0/args/-
+  value: --default-backend-service=$(POD_NAMESPACE)/nginx-ingress-default-backend
+
+- op: add
+  path: /spec/template/spec/containers/0/args/-
+  value: --election-id=ingress-controller-leader
+
+- op: add
+  path: /spec/template/spec/containers/0/args/-
+  value: --ingress-class=nginx
