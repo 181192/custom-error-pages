@@ -8,6 +8,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Build, Tag, Push
         uses: mattdavis0351/actions/docker-gpr@v1
         with:
