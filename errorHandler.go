@@ -3,13 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -124,7 +125,7 @@ func getStatusCode(req *http.Request) int {
 	code, err := strconv.Atoi(errCode)
 	if err != nil {
 		code = 404
-		log.Printf("unexpected error reading return code: %v. Using %v", err, code)
+		log.Warn().Msgf("unexpected error reading return code: %v. Using %v", err, code)
 	}
 
 	return code
@@ -144,17 +145,17 @@ func HTMLResponse(w http.ResponseWriter, r *http.Request) {
 	file := fmt.Sprintf("%v/%v%v", path, code, ".html")
 	f, err := os.Open(file)
 	if err != nil {
-		log.Printf("unexpected error opening file: %v", err)
+		log.Warn().Msgf("unexpected error opening file: %v", err)
 		scode := strconv.Itoa(code)
 		file := fmt.Sprintf("%v/%cxx%v", path, scode[0], ".html")
 		f, err := os.Open(file)
 		if err != nil {
-			log.Printf("unexpected error opening file: %v", err)
+			log.Warn().Msgf("unexpected error opening file: %v", err)
 			http.NotFound(w, r)
 			return
 		}
 		defer f.Close()
-		log.Printf("serving custom error response for code %v and format %v from file %v", code, HTML, file)
+		log.Info().Msgf("serving custom error response for code %v and format %v from file %v", code, HTML, file)
 		tmpl := template.Must(template.ParseFiles(f.Name(), styles.Name()))
 
 		data := newErrorPageData(r, "")
@@ -163,7 +164,7 @@ func HTMLResponse(w http.ResponseWriter, r *http.Request) {
 	}
 	defer f.Close()
 
-	log.Printf("serving custom error response for code %v and format %v from file %v", code, HTML, file)
+	log.Info().Msgf("serving custom error response for code %v and format %v from file %v", code, HTML, file)
 	tmpl := template.Must(template.ParseFiles(f.Name(), styles.Name()))
 
 	data := newErrorPageData(r, "")
