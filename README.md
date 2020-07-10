@@ -40,7 +40,14 @@ And here's the `application/json` respons:
 
 custom-error-pages supports 404, 500, 503 and 5xx error codes.
 
-## Getting started - Locally
+## Getting started - Locally `go get`
+
+```
+go get github.com/stacc-as/custom-error-pages
+custom-error-pages
+```
+
+## Getting started - Locally docker
 
 ```
 docker build -t custom-error-pages .
