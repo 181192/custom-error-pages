@@ -102,12 +102,17 @@ func getBaseErrorFilePath() string {
 
 func getFormat(req *http.Request) string {
 	format := "text/html"
-	formatHeader := strings.Split(req.Header[FormatHeader][0], ",")
+	formatHeader := req.Header[FormatHeader]
 
-	for i := range formatHeader {
-		if formatHeader[i] == JSON {
-			format = JSON
-			break
+	if len(formatHeader) != 0 {
+
+		formatString := strings.Split(formatHeader[0], ",")
+
+		for i := range formatString {
+			if formatString[i] == JSON {
+				format = JSON
+				break
+			}
 		}
 	}
 
