@@ -25,13 +25,13 @@ build: main.go
 ## build-all: Build all linux plattforms
 build-all: main.go
 	for arch in amd64; do \
-			for os in linux; do \
-				CGO_ENABLED=0 GOOS=$$os GOARCH=$$arch go build -o "build/custom_error_pages"$$os"_$$arch" $(LDFLAGS) -ldflags "-X 'github.com/181192/ops-cli/pkg/util/version.Version=$$(git describe --tags --abbrev=0)' -X 'github.com/181192/ops-cli/pkg/util/version.GitCommit=$$(git rev-parse --short HEAD)'"; \
+			for os in linux darwin; do \
+				CGO_ENABLED=0 GOOS=$$os GOARCH=$$arch go build -o "build/custom_error_pages_"$$os"_$$arch" $(LDFLAGS); \
 			done; \
 		done;
 		for arch in arm arm64; do \
 			for os in linux; do \
-				CGO_ENABLED=0 GOOS=$$os GOARCH=$$arch go build -o "build/custom_error_pages"$$os"_$$arch" $(LDFLAGS) -ldflags "-X 'github.com/181192/ops-cli/pkg/util/version.Version=$$(git describe --tags --abbrev=0)' -X 'github.com/181192/ops-cli/pkg/util/version.GitCommit=$$(git rev-parse --short HEAD)'"; \
+				CGO_ENABLED=0 GOOS=$$os GOARCH=$$arch go build -o "build/custom_error_pages_"$$os"_$$arch" $(LDFLAGS); \
 			done; \
 	done;
 
