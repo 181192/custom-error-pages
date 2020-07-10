@@ -124,6 +124,17 @@ h1 {
   text-align: center;
 }
 
+.details {
+  max-width: 490px;
+  margin: 30px auto 30px;
+  text-align: left;
+}
+
+.details > p {
+  font-size: 19px;
+  text-align: center;
+}
+
 .link-container {
   text-align: center;
 }
