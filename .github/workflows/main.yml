@@ -16,8 +16,14 @@ jobs:
           login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-      - run: |
+      - name: Push ACR
+        run: |
           docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sail/custom-error-pages:${{ github.sha }}
           docker tag ${{ secrets.REGISTRY_LOGIN_SERVER }}/sail/custom-error-pages:${{ github.sha }} ${{ secrets.REGISTRY_LOGIN_SERVER }}/sail/custom-error-pages:latest
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sail/custom-error-pages:${{ github.sha }}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sail/custom-error-pages:latest
+      - name: Push Github Packages
+        run: |
+          docker login docker.pkg.github.com -u ${{ github.actor }} -p ${{ github.token }}
+          docker build . -t docker.pkg.github.com/${{ github.repository }}:${{ github.sha }} .
+          docker push docker.pkg.github.com/${{ github.repository }}:${{ github.sha }}
