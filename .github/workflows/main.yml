@@ -11,7 +11,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build, Tag, Push
-        uses: mattdavis0351/actions/docker-gpr@v1
+        id: acr
+        uses: ams0/acr-task-github-action@v1
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          image-name: custom-error-pages
+          service_principal: ${{ secrets.service_principal }}
+          service_principal_password: ${{ secrets.service_principal_password }}
+          tenant: ${{ secrets.tenant }}
+          registry: ${{ secrets.registry }}
+          repository: ${{ secrets.repository }}
