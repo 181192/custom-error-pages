@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"text/template"
 	"time"
 )
@@ -100,10 +101,14 @@ func getBaseErrorFilePath() string {
 }
 
 func getFormat(req *http.Request) string {
-	format := req.Header.Get(FormatHeader)
-	if format == "" {
-		format = "text/html"
-		log.Printf("format not specified. Using %v", format)
+	format := "text/html"
+	formatHeader := strings.Split(req.Header[FormatHeader][0], ",")
+
+	for i := range formatHeader {
+		if formatHeader[i] == JSON {
+			format = JSON
+			break
+		}
 	}
 
 	return format
