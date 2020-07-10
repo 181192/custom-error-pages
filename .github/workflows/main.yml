@@ -25,5 +25,5 @@ jobs:
       - name: Push Github Packages
         run: |
           docker login docker.pkg.github.com -u ${{ github.actor }} -p ${{ github.token }}
-          docker build -t docker.pkg.github.com/${{ github.repository }}:${{ github.sha }} .
-          docker push docker.pkg.github.com/${{ github.repository }}:${{ github.sha }}
+          docker build -t docker.pkg.github.com/${{ github.repository }}/custom-error-pages:${{ github.sha }} .
+          docker push docker.pkg.github.com/${{ github.repository }}/custom-error-pages:${{ github.sha }}
