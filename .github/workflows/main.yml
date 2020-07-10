@@ -18,6 +18,6 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
           docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sail/custom-error-pages:${{ github.sha }}
-          docker tag ${{ secrets.REGISTRY_LOGIN_SERVER }}/sail/custom-error-pages:${{ github.sha }} ${{ secrets.REGISTRY_LOGIN_SERVER }}/custom-error-pages:latest
+          docker tag ${{ secrets.REGISTRY_LOGIN_SERVER }}/sail/custom-error-pages:${{ github.sha }} ${{ secrets.REGISTRY_LOGIN_SERVER }}/sail/custom-error-pages:latest
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sail/custom-error-pages:${{ github.sha }}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sail/custom-error-pages:latest
