@@ -47,5 +47,5 @@ k3d-import: docker-build
 	k3d i custom-error-pages
 
 k8s-deploy: k3d-import
-	kubectl apply -k k8s/nginx-ingress
+	kubectl apply -k k8s
 	kubectl rollout restart deployment nginx-ingress-default-backend -n kube-system
