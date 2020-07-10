@@ -1,4 +1,4 @@
-FROM golang:1.13.5-alpine as build
+FROM golang:1.14.4-alpine as build
 ENV CGO_ENABLED=0
 
 ARG GOOS=linux
