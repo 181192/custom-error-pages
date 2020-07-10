@@ -55,8 +55,8 @@ docker run --rm -p 8080:8080 custom-error-pages:latest
 
 ```
 controller:
-    config:
-    custom-http-errors: 404,500,501,502,503
+  config:
+  custom-http-errors: 404,500,501,502,503
 defaultBackend:
   enabled: true
   image:
