@@ -26,7 +26,9 @@ And here's the `application/json` respons:
 {
   "code": "404",
   "title": "Not Found",
-  "message": "Not Found",
+  "message": [
+    "The page you're looking for could not be found."
+  ],
   "details": {
     "originalURI": "/status/404",
     "namespace": "default",
@@ -42,14 +44,13 @@ custom-error-pages supports 404, 500, 503 and 5xx error codes.
 
 ## Getting started - Locally `go get`
 
-```
-go get github.com/stacc-as/custom-error-pages
-custom-error-pages
+```bash
+go get github.com/stacc-as/custom-error-pages && custom-error-pages
 ```
 
 ## Getting started - Locally docker
 
-```
+```bash
 docker build -t custom-error-pages .
 docker run --rm -p 8080:8080 custom-error-pages:latest
 ```
@@ -60,7 +61,7 @@ docker run --rm -p 8080:8080 custom-error-pages:latest
 2. Enable default backend
 3. Set the default backend image
 
-```
+```yaml
 controller:
   config:
   custom-http-errors: 404,500,501,502,503
@@ -76,19 +77,19 @@ defaultBackend:
 > 1.  Create new Github Personal Access Token with read:packages scope at https://github.com/settings/tokens/new.
 > 2.  Base64 encode token with username
 >
-> ```
+> ```bash
 > export AUTH=$(echo -n <your-github-username>:<token> | base64)
 > ```
 >
 > 3.  Create k8s secret
 >
-> ```
+> ```bash
 >  echo '{"auths":{"docker.pkg.github.com":{"auth":"$AUTH"}}}' | kubectl create secret generic dockerconfigjson-github-com --type=kubernetes.io/dockerconfigjson --from-file=.dockerconfigjson=/dev/stdin
 > ```
 >
 > 4. Append the imagePullSecret in `values.yaml` for the ingress-nginx
 >
-> ```
+> ```yaml
 > imagePullSecrets:
 >  - name: dockerconfigjson-github-com
 > ```
@@ -97,6 +98,6 @@ defaultBackend:
 
 Kustomize manifest are provided with both ingress controller and default backend deployment
 
-```
+```bash
 kubectl apply -f k8s/
 ```
