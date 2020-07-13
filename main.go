@@ -27,6 +27,11 @@ const (
 	errFilesPathEnv = "ERROR_FILES_PATH"
 )
 
+var (
+	gitCommit = "unversioned"
+	date      = "unversioned"
+)
+
 // Options cli options
 type Options struct {
 	HTTPListenAddress string
@@ -62,8 +67,9 @@ func main() {
 	http.Handle("/metrics", promhttp.Handler())
 	http.HandleFunc("/healthz", healthHandler)
 
-	log.Info().Msgf("Config values: %+v", getConfig(flag.CommandLine))
-	log.Info().Msgf("Listening on %s", opts.HTTPListenAddress)
+	log.Debug().Msgf("config values: %+v", getConfig(flag.CommandLine))
+	log.Info().Msgf("version=%s, date=%s", gitCommit, date)
+	log.Info().Msgf("listening on %s", opts.HTTPListenAddress)
 	err := http.ListenAndServe(opts.HTTPListenAddress, nil)
 	log.Fatal().Msg(err.Error())
 }

@@ -18,6 +18,9 @@ COPY . .
 
 RUN GOOS=${GOOS} GOARCH=${GOARCH} go build \
   ${LDFLAGS} \
+    ${LDFLAGS} \
+  -ldflags " \
+  -X 'main.gitCommit=$(git rev-parse --short HEAD)' -X 'main.date=$(date --utc +%F_%T)'" \
   -o "custom-error-pages" .
 
 FROM build as test
