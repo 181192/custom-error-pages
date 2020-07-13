@@ -41,10 +41,6 @@ const (
 	// RequestID is a unique ID that identifies the request - same as for backend service
 	RequestID = "X-Request-ID"
 
-	// ErrFilesPathVar is the name of the environment variable indicating
-	// the location on disk of files served by the handler.
-	ErrFilesPathVar = "ERROR_FILES_PATH"
-
 	// JSON content-type for json
 	JSON = "application/json"
 
@@ -92,17 +88,8 @@ func newErrorPageData(req *http.Request, message string) errorPageData {
 	}
 }
 
-func getBaseErrorFilePath() string {
-	errFilesPath := "./www"
-	if os.Getenv(ErrFilesPathVar) != "" {
-		errFilesPath = os.Getenv(ErrFilesPathVar)
-	}
-
-	return errFilesPath
-}
-
 func getFormat(req *http.Request) string {
-	format := "text/html"
+	format := HTML
 	formatHeader := req.Header[FormatHeader]
 
 	if len(formatHeader) != 0 {
@@ -125,15 +112,14 @@ func getStatusCode(req *http.Request) int {
 	code, err := strconv.Atoi(errCode)
 	if err != nil {
 		code = 404
-		log.Warn().Msgf("unexpected error reading return code: %v. Using %v", err, code)
+		log.Debug().Msgf("unexpected error reading return code: %v. Using %v", err, code)
 	}
 
 	return code
 }
 
 // HTMLResponse returns html reponse
-func HTMLResponse(w http.ResponseWriter, r *http.Request) {
-	path := getBaseErrorFilePath()
+func HTMLResponse(w http.ResponseWriter, r *http.Request, path string) {
 	code := getStatusCode(r)
 
 	w.Header().Set(ContentType, HTML)
@@ -155,7 +141,7 @@ func HTMLResponse(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer f.Close()
-		log.Info().Msgf("serving custom error response for code %v and format %v from file %v", code, HTML, file)
+		log.Debug().Msgf("serving custom error response for code %v and format %v from file %v", code, HTML, file)
 		tmpl := template.Must(template.ParseFiles(f.Name(), styles.Name()))
 
 		data := newErrorPageData(r, "")
@@ -164,7 +150,7 @@ func HTMLResponse(w http.ResponseWriter, r *http.Request) {
 	}
 	defer f.Close()
 
-	log.Info().Msgf("serving custom error response for code %v and format %v from file %v", code, HTML, file)
+	log.Debug().Msgf("serving custom error response for code %v and format %v from file %v", code, HTML, file)
 	tmpl := template.Must(template.ParseFiles(f.Name(), styles.Name()))
 
 	data := newErrorPageData(r, "")
@@ -180,28 +166,16 @@ func JSONResponse(w http.ResponseWriter, r *http.Request) {
 	w.Write(body)
 }
 
-func errorHandler(w http.ResponseWriter, r *http.Request) {
+// ServeHttp error handler
+func (opts *Options) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
-
-	if os.Getenv("DEBUG") != "" {
-		w.Header().Set(FormatHeader, r.Header.Get(FormatHeader))
-		w.Header().Set(CodeHeader, r.Header.Get(CodeHeader))
-		w.Header().Set(ContentType, r.Header.Get(ContentType))
-		w.Header().Set(OriginalURI, r.Header.Get(OriginalURI))
-		w.Header().Set(Namespace, r.Header.Get(Namespace))
-		w.Header().Set(IngressName, r.Header.Get(IngressName))
-		w.Header().Set(ServiceName, r.Header.Get(ServiceName))
-		w.Header().Set(ServicePort, r.Header.Get(ServicePort))
-		w.Header().Set(RequestID, r.Header.Get(RequestID))
-	}
-
 	format := getFormat(r)
 
 	switch format {
 	case JSON:
 		JSONResponse(w, r)
 	default:
-		HTMLResponse(w, r)
+		HTMLResponse(w, r, opts.ErrFilesPath)
 	}
 
 	duration := time.Now().Sub(start).Seconds()
