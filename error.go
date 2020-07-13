@@ -51,7 +51,7 @@ const (
 type errorPageData struct {
 	Code    string               `json:"code"`
 	Title   string               `json:"title"`
-	Message string               `json:"message"`
+	Message []string             `json:"message"`
 	Details errorPageDataDetails `json:"details,omitempty"`
 }
 
@@ -64,14 +64,10 @@ type errorPageDataDetails struct {
 	RequestID   string `json:"requestId"`
 }
 
-func newErrorPageData(req *http.Request, message string) errorPageData {
+func newErrorPageData(req *http.Request, message []string) errorPageData {
 	statusCode := req.Header.Get(CodeHeader)
 	statusCodeNumber, _ := strconv.Atoi(req.Header.Get(CodeHeader))
 	statusText := http.StatusText(statusCodeNumber)
-
-	if message == "" {
-		message = statusText
-	}
 
 	return errorPageData{
 		Code:    statusCode,
@@ -118,34 +114,33 @@ func getStatusCode(req *http.Request) int {
 	return code
 }
 
+func getMessage(code int) []string {
+	switch code {
+	case http.StatusNotFound:
+		return []string{"The page you're looking for could not be found."}
+	case http.StatusServiceUnavailable:
+		return []string{"Ooops, this shouldn't have happened.", "The server is temporary busy, try again later!"}
+	default:
+		return []string{http.StatusText(code)}
+	}
+}
+
 // HTMLResponse returns html reponse
 func HTMLResponse(w http.ResponseWriter, r *http.Request, path string) {
 	code := getStatusCode(r)
+	message := getMessage(code)
 
 	w.Header().Set(ContentType, HTML)
 	w.WriteHeader(code)
 
-	stylesPath := fmt.Sprintf("%v/%v", path, "styles.css")
+	stylesPath := fmt.Sprintf("%v/styles.css", path)
 	styles, err := os.Open(stylesPath)
 
-	file := fmt.Sprintf("%v/%v%v", path, code, ".html")
+	file := fmt.Sprintf("%v/template.html", path)
 	f, err := os.Open(file)
 	if err != nil {
 		log.Warn().Msgf("unexpected error opening file: %v", err)
-		scode := strconv.Itoa(code)
-		file := fmt.Sprintf("%v/%cxx%v", path, scode[0], ".html")
-		f, err := os.Open(file)
-		if err != nil {
-			log.Warn().Msgf("unexpected error opening file: %v", err)
-			http.NotFound(w, r)
-			return
-		}
-		defer f.Close()
-		log.Debug().Msgf("serving custom error response for code %v and format %v from file %v", code, HTML, file)
-		tmpl := template.Must(template.ParseFiles(f.Name(), styles.Name()))
-
-		data := newErrorPageData(r, "")
-		tmpl.Execute(w, data)
+		JSONResponse(w, r)
 		return
 	}
 	defer f.Close()
@@ -153,16 +148,18 @@ func HTMLResponse(w http.ResponseWriter, r *http.Request, path string) {
 	log.Debug().Msgf("serving custom error response for code %v and format %v from file %v", code, HTML, file)
 	tmpl := template.Must(template.ParseFiles(f.Name(), styles.Name()))
 
-	data := newErrorPageData(r, "")
+	data := newErrorPageData(r, message)
 	tmpl.Execute(w, data)
 }
 
 // JSONResponse returns json reponse
 func JSONResponse(w http.ResponseWriter, r *http.Request) {
 	code := getStatusCode(r)
+	message := getMessage(code)
+
 	w.Header().Set(ContentType, JSON)
 	w.WriteHeader(code)
-	body, _ := json.Marshal(newErrorPageData(r, ""))
+	body, _ := json.Marshal(newErrorPageData(r, message))
 	w.Write(body)
 }
 
