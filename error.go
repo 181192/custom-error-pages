@@ -130,9 +130,6 @@ func HTMLResponse(w http.ResponseWriter, r *http.Request, path string) {
 	code := getStatusCode(r)
 	message := getMessage(code)
 
-	w.Header().Set(ContentType, HTML)
-	w.WriteHeader(code)
-
 	stylesPath := fmt.Sprintf("%v/styles.css", path)
 	styles, err := os.Open(stylesPath)
 
@@ -147,6 +144,9 @@ func HTMLResponse(w http.ResponseWriter, r *http.Request, path string) {
 
 	log.Debug().Msgf("serving custom error response for code %v and format %v from file %v", code, HTML, file)
 	tmpl := template.Must(template.ParseFiles(f.Name(), styles.Name()))
+
+	w.Header().Set(ContentType, HTML)
+	w.WriteHeader(code)
 
 	data := newErrorPageData(r, message)
 	tmpl.Execute(w, data)
