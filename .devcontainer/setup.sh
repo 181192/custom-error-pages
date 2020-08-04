@@ -39,3 +39,4 @@ go get -u -v github.com/zmb3/gogetdoc
 go get -u -v golang.org/x/lint/golint
 go get -u -v golang.org/x/tools/cmd/gorename
 go get -u -v golang.org/x/tools/gopls
+go get -u -v golang.org/x/tools/cmd/goimports

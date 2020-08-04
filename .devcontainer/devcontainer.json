@@ -13,6 +13,7 @@
     "dockerFile": "Dockerfile",
     "settings": {
         "terminal.integrated.shell.linux": "/usr/bin/bash",
+        "go.formatTool": "goimports",
         "files.exclude": {
             "**/CODE_OF_CONDUCT.md": true,
             "**/LICENSE": true
