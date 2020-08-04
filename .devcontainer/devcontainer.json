@@ -8,11 +8,11 @@
         "ms-vsliveshare.vsliveshare",
         "vscode-icons-team.vscode-icons",
         "visualstudioexptteam.vscodeintellicode",
-        "ms-vscode.go"
+        "golang.go"
     ],
     "dockerFile": "Dockerfile",
     "settings": {
-        "terminal.integrated.shell.linux": "/usr/bin/bash",
+        "terminal.integrated.shell.linux": "/bin/bash",
         "go.formatTool": "goimports",
         "files.exclude": {
             "**/CODE_OF_CONDUCT.md": true,
