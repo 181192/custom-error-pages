@@ -1,6 +1,6 @@
 # install curl, git, ...
 apt-get update
-apt-get install -y curl git jq
+apt-get install -y curl git jq make
 
 useradd -m user
 su user
@@ -38,3 +38,4 @@ go get -u -v github.com/uudashr/gopkgs/cmd/gopkgs
 go get -u -v github.com/zmb3/gogetdoc
 go get -u -v golang.org/x/lint/golint
 go get -u -v golang.org/x/tools/cmd/gorename
+go get -u -v golang.org/x/tools/gopls
