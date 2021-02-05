@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-ingress-default-backend
+  name: ingress-nginx-default-backend
 spec:
   replicas: 1
   template:
     spec:
       containers:
-        - name: nginx-ingress-default-backend
-          image: custom-error-pages:latest
-          imagePullPolicy: Never
+        - name: ingress-nginx-default-backend
+          image: ghcr.io/181192/custom-error-pages
+          imagePullPolicy: IfNotPresent
           securityContext:
             runAsUser: 65534
           ports:
@@ -36,5 +36,5 @@ spec:
             timeoutSeconds: 5
             successThreshold: 1
             failureThreshold: 6
-      serviceAccountName: nginx-ingress-serviceaccount
+      serviceAccountName: ingress-nginx
       terminationGracePeriodSeconds: 60

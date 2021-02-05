@@ -3,18 +3,22 @@ kind: Kustomization
 namespace: kube-system
 commonLabels:
   app.kubernetes.io/name: ingress-nginx
-  app.kubernetes.io/part-of: ingress-nginx
+  app.kubernetes.io/instance: ingress-nginx
+  app.kubernetes.io/version: "0.43.0"
+  app.kubernetes.io/component: controller
 resources:
+  - cluster-role-binding.yaml
+  - cluster-role.yaml
   - deployment.yaml
+  - ingress-class.yaml
   - role-binding.yaml
   - role.yaml
-  - cluster-role.yaml
-  - cluster-role-binding.yaml
-  - service-account.yaml
   - service.yaml
+  - service-account.yaml
+  - service-metrics.yaml
 images:
-  - name: quay.io/kubernetes-ingress-controller/nginx-ingress-controller
-    newTag: 0.26.1
+  - name: k8s.gcr.io/ingress-nginx/controller
+    newTag: v0.43.0@sha256:9bba603b99bf25f6d117cf1235b6598c16033ad027b143c90fa5b3cc583c5713
 vars:
   - fieldref:
       fieldPath: metadata.name
@@ -22,16 +26,16 @@ vars:
     objref:
       apiVersion: v1
       kind: ConfigMap
-      name: nginx-configuration
+      name: ingress-nginx-controller
   - fieldref:
       fieldPath: metadata.name
     name: SERVICE_NAME
     objref:
       apiVersion: v1
       kind: Service
-      name: ingress-nginx
+      name: ingress-nginx-controller
 configMapGenerator:
-  - name: nginx-configuration
+  - name: ingress-nginx-controller
     literals:
       - body-size=64m
       - enable-vts-status="false"

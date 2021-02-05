@@ -1,9 +1,0 @@
-body-size: 64m
-enable-vts-status: "false"
-hsts-include-subdomains: "false"
-proxy-body-size: 10m
-proxy-buffer-size: 16k
-proxy-connect-timeout: "15"
-proxy-read-timeout: "600"
-proxy-send-timeout: "600"
-server-name-hash-bucket-size: "256"
