@@ -45,7 +45,7 @@ custom-error-pages supports 404, 500, 503 and 5xx error codes.
 ## Getting started - Locally `go get`
 
 ```bash
-go get github.com/stacc-as/custom-error-pages && custom-error-pages
+go get github.com/181192/custom-error-pages && custom-error-pages
 ```
 
 ## Getting started - Locally docker
@@ -68,7 +68,7 @@ controller:
 defaultBackend:
   enabled: true
   image:
-    repository: docker.pkg.github.com/stacc-as/custom-error-pages/custom-error-pages
+    repository: docker.pkg.github.com/181192/custom-error-pages/custom-error-pages
     tag: latest
 ```
 

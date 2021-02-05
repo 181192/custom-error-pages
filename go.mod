@@ -1,4 +1,4 @@
-module github.com/stacc-as/custom-error-pages
+module github.com/181192/custom-error-pages
 
 go 1.14
 
