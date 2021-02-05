@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Push Github Packages
         run: |
-          echo $CR_PAT | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+          echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
           docker build -t ghcr.io/${{ github.repository }}:${GITHUB_SHA::8} .
           docker tag ghcr.io/${{ github.repository }}:${GITHUB_SHA::8} ghcr.io/${{ github.repository }}:latest
           docker push ghcr.io/${{ github.repository }}:${GITHUB_SHA::8}
