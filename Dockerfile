@@ -31,6 +31,9 @@ RUN go test ./...
 
 FROM alpine:3.13.1
 
+LABEL org.opencontainers.image.source "https://github.com/181192/custom-error-pages"
+LABEL org.opencontainers.image.authors "Kristoffer-Andre Kalliainen <k@kalli.no>"
+
 COPY etc etc
 COPY www www
 COPY --from=build /app/custom-error-pages /custom-error-pages

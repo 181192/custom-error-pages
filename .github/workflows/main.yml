@@ -13,7 +13,7 @@ jobs:
       - name: Push Github Packages
         run: |
           echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
-          docker build -t ghcr.io/${{ github.repository }}:${GITHUB_SHA::8} .
+          docker build -t ghcr.io/${{ github.repository }}:${GITHUB_SHA::8} . --label org.opencontainers.image.version=${GITHUB_SHA::8} --label org.opencontainers.image.revision=${GITHUB_SHA}
           docker tag ghcr.io/${{ github.repository }}:${GITHUB_SHA::8} ghcr.io/${{ github.repository }}:latest
           docker push ghcr.io/${{ github.repository }}:${GITHUB_SHA::8}
           docker push ghcr.io/${{ github.repository }}:latest
