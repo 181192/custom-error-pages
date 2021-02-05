@@ -51,6 +51,12 @@ go get github.com/181192/custom-error-pages && custom-error-pages
 ## Getting started - Locally docker
 
 ```bash
+docker run --rm -p 8080:8080 ghcr.io/181192/custom-error-pages
+```
+
+Or build locally
+
+```bash
 docker build -t custom-error-pages .
 docker run --rm -p 8080:8080 custom-error-pages:latest
 ```
@@ -68,31 +74,9 @@ controller:
 defaultBackend:
   enabled: true
   image:
-    repository: docker.pkg.github.com/181192/custom-error-pages/custom-error-pages
+    repository: ghcr.io/181192/custom-error-pages
     tag: latest
 ```
-
-> NOTE: Github Packages still requires auth even on public repositories. An imagePullSecret needs to be created.
->
-> 1.  Create new Github Personal Access Token with read:packages scope at https://github.com/settings/tokens/new.
-> 2.  Base64 encode token with username
->
-> ```bash
-> export AUTH=$(echo -n <your-github-username>:<token> | base64)
-> ```
->
-> 3.  Create k8s secret
->
-> ```bash
->  echo '{"auths":{"docker.pkg.github.com":{"auth":"$AUTH"}}}' | kubectl create secret generic dockerconfigjson-github-com --type=kubernetes.io/dockerconfigjson --from-file=.dockerconfigjson=/dev/stdin
-> ```
->
-> 4. Append the imagePullSecret in `values.yaml` for the ingress-nginx
->
-> ```yaml
-> imagePullSecrets:
->  - name: dockerconfigjson-github-com
-> ```
 
 ## Getting started - Kustomize
 
