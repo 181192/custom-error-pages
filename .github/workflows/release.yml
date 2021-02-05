@@ -1,0 +1,24 @@
+name: Docker
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+       - '*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Push Github Packages
+        run: |
+          echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+          docker build -t ghcr.io/${{ github.repository }}:${{ env.RELEASE_VERSION }} . --label org.opencontainers.image.version=${{ env.RELEASE_VERSION }} --label org.opencontainers.image.revision=${GITHUB_SHA}
+          docker tag ghcr.io/${{ github.repository }}:${{ env.RELEASE_VERSION }} ghcr.io/${{ github.repository }}:latest
+          docker push ghcr.io/${{ github.repository }}:${{ env.RELEASE_VERSION }}
+          docker push ghcr.io/${{ github.repository }}:latest
