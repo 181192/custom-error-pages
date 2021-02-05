@@ -1,4 +1,4 @@
-FROM golang:1.14.4-alpine as build
+FROM golang:1.15.8-alpine as build
 ENV CGO_ENABLED=0
 
 ARG GOOS=linux
@@ -29,7 +29,7 @@ ENV CI true
 
 RUN go test ./...
 
-FROM alpine:3.10
+FROM alpine:3.13.1
 
 COPY etc etc
 COPY www www
