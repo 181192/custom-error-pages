@@ -1,0 +1,103 @@
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+builds:
+  - id: custom-error-pages
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm
+      - arm64
+    binary: custom-error-pages
+    ldflags:
+      - -s -w -X main.version={{ .Version }} -X main.gitCommit={{ .Commit }} -X main.date={{ .Date }}
+archives:
+  - name_template: "custom-error-pages-{{ .Os }}-{{ .Arch }}"
+    format: binary
+dockers:
+  - goos: linux
+    goarch: amd64
+    ids:
+      - custom-error-pages
+    image_templates:
+      - "ghcr.io/181192/custom-error-pages:{{ .Version }}-amd64"
+    use_buildx: true
+    build_flag_templates:
+      - --platform=linux/amd64
+      - --pull
+      - --label=org.opencontainers.image.title={{ .ProjectName }}
+      - --label=org.opencontainers.image.description={{ .ProjectName }}
+      - --label=org.opencontainers.image.url=https://github.com/181192/custom-error-pages
+      - --label=org.opencontainers.image.source=https://github.com/181192/custom-error-pages
+      - --label=org.opencontainers.image.version={{ .Version }}
+      - --label=org.opencontainers.image.created={{ .Date }}
+      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+      - --label=org.opencontainers.image.licenses=MIT
+    extra_files:
+      - etc
+      - www
+  - goos: linux
+    goarch: arm
+    ids:
+      - custom-error-pages
+    image_templates:
+      - "ghcr.io/181192/custom-error-pages:{{ .Version }}-arm"
+    use_buildx: true
+    build_flag_templates:
+      - --platform=linux/arm
+      - --pull
+      - --label=org.opencontainers.image.title={{ .ProjectName }}
+      - --label=org.opencontainers.image.description={{ .ProjectName }}
+      - --label=org.opencontainers.image.url=https://github.com/181192/custom-error-pages
+      - --label=org.opencontainers.image.source=https://github.com/181192/custom-error-pages
+      - --label=org.opencontainers.image.version={{ .Version }}
+      - --label=org.opencontainers.image.created={{ .Date }}
+      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+      - --label=org.opencontainers.image.licenses=MIT
+    extra_files:
+      - etc
+      - www
+  - goos: linux
+    goarch: arm64
+    ids:
+      - custom-error-pages
+    image_templates:
+      - "ghcr.io/181192/custom-error-pages:{{ .Version }}-arm64"
+    use_buildx: true
+    build_flag_templates:
+      - --platform=linux/arm64
+      - --pull
+      - --label=org.opencontainers.image.title={{ .ProjectName }}
+      - --label=org.opencontainers.image.description={{ .ProjectName }}
+      - --label=org.opencontainers.image.url=https://github.com/181192/custom-error-pages
+      - --label=org.opencontainers.image.source=https://github.com/181192/custom-error-pages
+      - --label=org.opencontainers.image.version={{ .Version }}
+      - --label=org.opencontainers.image.created={{ .Date }}
+      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+      - --label=org.opencontainers.image.licenses=MIT
+    extra_files:
+      - etc
+      - www
+release:
+  disable: true
+docker_manifests:
+  - name_template: ghcr.io/181192/custom-error-pages:{{ .Version }}
+    image_templates:
+      - ghcr.io/181192/custom-error-pages:{{ .Version }}-amd64
+      - ghcr.io/181192/custom-error-pages:{{ .Version }}-arm64
+      - ghcr.io/181192/custom-error-pages:{{ .Version }}-arm
+  - name_template: ghcr.io/181192/custom-error-pages:latest
+    image_templates:
+      - ghcr.io/181192/custom-error-pages:{{ .Version }}-amd64
+      - ghcr.io/181192/custom-error-pages:{{ .Version }}-arm64
+      - ghcr.io/181192/custom-error-pages:{{ .Version }}-arm
