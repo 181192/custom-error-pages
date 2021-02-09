@@ -35,6 +35,9 @@ build-all: main.go
 			done; \
 	done;
 
+test:
+	go test -v ./...
+
 ## docker-build: Build docker image
 docker-build:
 	docker build -t custom-error-pages .

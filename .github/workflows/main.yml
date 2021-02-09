@@ -46,7 +46,7 @@ jobs:
             ${{ runner.os }}-go-
 
       - name: Get dependencies
-        run: make deps
+        run: make install
 
       - name: Test
         env:
