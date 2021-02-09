@@ -89,8 +89,6 @@ dockers:
     extra_files:
       - etc
       - www
-release:
-  disable: true
 docker_manifests:
   - name_template: ghcr.io/181192/custom-error-pages:{{ .Version }}
     image_templates:
