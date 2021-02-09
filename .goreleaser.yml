@@ -48,6 +48,7 @@ dockers:
       - www
   - goos: linux
     goarch: arm
+    goarm: "6"
     ids:
       - custom-error-pages
     image_templates:
