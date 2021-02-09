@@ -29,6 +29,7 @@ const (
 
 var (
 	gitCommit = "unversioned"
+	version   = "unversioned"
 	date      = "unversioned"
 )
 
@@ -68,7 +69,7 @@ func main() {
 	http.HandleFunc("/healthz", healthHandler)
 
 	log.Debug().Msgf("config values: %+v", getConfig(flag.CommandLine))
-	log.Info().Msgf("version=%s, date=%s", gitCommit, date)
+	log.Info().Msgf("version=%s, commit=%s, date=%s", version, gitCommit, date)
 	log.Info().Msgf("listening on %s", opts.HTTPListenAddress)
 	err := http.ListenAndServe(opts.HTTPListenAddress, nil)
 	log.Fatal().Msg(err.Error())
