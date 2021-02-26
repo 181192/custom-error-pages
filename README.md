@@ -26,7 +26,7 @@ And here's the `application/json` respons:
 {
   "code": "404",
   "title": "Not Found",
-  "message": [
+  "messages": [
     "The page you're looking for could not be found."
   ],
   "details": {
@@ -41,6 +41,16 @@ And here's the `application/json` respons:
 ```
 
 custom-error-pages supports 404, 500, 503 and 5xx error codes.
+
+## Configurations
+
+| Flag                    | Evironment variable   | Default | Description                                         |
+| ----------------------- | --------------------- | ------- | --------------------------------------------------- |
+| `--debug`               | `DEBUG`               | `false` | enable debug log                                    |
+| `--error-files-path`    | `ERROR_FILES_PATH`    | `./www` | the location on disk of files served by the handler |
+| `--hide-details`        | `HIDE_DETAILS`        | `false` | hide request details in response                    |
+| `--http-listen-address` | `HTTP_LISTEN_ADDRESS` | `:8080` | http server address                                 |
+| `--log-color`           | `LOG_COLOR`           | `false` | sets log format to human-friendly, colorized output |
 
 ## Getting started - Locally `go get`
 
