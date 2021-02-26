@@ -1,16 +1,17 @@
-package main
+package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"text/template"
-	"time"
 
+	"github.com/181192/custom-error-pages/pkg/metrics"
+	"github.com/181192/custom-error-pages/pkg/util"
+	"github.com/oxtoacart/bpool"
 	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -48,11 +49,17 @@ const (
 	HTML = "text/html"
 )
 
+var bufpool *bpool.BufferPool
+
+func init() {
+	bufpool = bpool.NewBufferPool(64)
+}
+
 type errorPageData struct {
-	Code    string               `json:"code"`
-	Title   string               `json:"title"`
-	Message []string             `json:"message"`
-	Details errorPageDataDetails `json:"details,omitempty"`
+	Code     string                `json:"code"`
+	Title    string                `json:"title"`
+	Messages []string              `json:"messages"`
+	Details  *errorPageDataDetails `json:"details,omitempty"`
 }
 
 type errorPageDataDetails struct {
@@ -64,24 +71,28 @@ type errorPageDataDetails struct {
 	RequestID   string `json:"requestId"`
 }
 
-func newErrorPageData(req *http.Request, message []string) errorPageData {
-	statusCode := req.Header.Get(CodeHeader)
-	statusCodeNumber, _ := strconv.Atoi(req.Header.Get(CodeHeader))
-	statusText := http.StatusText(statusCodeNumber)
+func newErrorPageData(req *http.Request, code int, messages []string) errorPageData {
+	title := http.StatusText(code)
 
-	return errorPageData{
-		Code:    statusCode,
-		Title:   statusText,
-		Message: message,
-		Details: errorPageDataDetails{
+	data := errorPageData{
+		Code:     strconv.Itoa(code),
+		Title:    title,
+		Messages: messages,
+	}
+
+	hideDetails := viper.GetBool(util.HideDetails)
+	if !hideDetails {
+		data.Details = &errorPageDataDetails{
 			OriginalURI: req.Header.Get(OriginalURI),
 			Namespace:   req.Header.Get(Namespace),
 			IngressName: req.Header.Get(IngressName),
 			ServiceName: req.Header.Get(ServiceName),
 			ServicePort: req.Header.Get(ServicePort),
 			RequestID:   req.Header.Get(RequestID),
-		},
+		}
 	}
+
+	return data
 }
 
 func getFormat(req *http.Request) string {
@@ -114,7 +125,7 @@ func getStatusCode(req *http.Request) int {
 	return code
 }
 
-func getMessage(code int) []string {
+func getMessages(code int) []string {
 	switch code {
 	case http.StatusNotFound:
 		return []string{"The page you're looking for could not be found."}
@@ -125,61 +136,79 @@ func getMessage(code int) []string {
 	}
 }
 
-// HTMLResponse returns html reponse
-func HTMLResponse(w http.ResponseWriter, r *http.Request, path string) {
+// htmlResponse returns html reponse
+func htmlResponse(w http.ResponseWriter, r *http.Request) {
 	code := getStatusCode(r)
-	message := getMessage(code)
+	messages := getMessages(code)
 
-	stylesPath := fmt.Sprintf("%v/styles.css", path)
-	styles, err := os.Open(stylesPath)
+	buf := bufpool.Get()
+	defer bufpool.Put(buf)
 
-	file := fmt.Sprintf("%v/template.html", path)
-	f, err := os.Open(file)
+	templatesDir := viper.GetString(util.ErrFilesPath) + "/*"
+	templates, err := template.ParseGlob(templatesDir)
 	if err != nil {
-		log.Warn().Msgf("unexpected error opening file: %v", err)
-		JSONResponse(w, r)
+		log.Error().Msgf("Failed to parse template %s", err)
+		w.Header().Set(ContentType, JSON)
+		w.WriteHeader(http.StatusInternalServerError)
+		body, _ := json.Marshal(newErrorPageData(r, http.StatusInternalServerError,
+			[]string{"Ups, this should not have happened", "Failed to parse templates"}))
+		w.Write(body)
 		return
 	}
-	defer f.Close()
 
-	log.Debug().Msgf("serving custom error response for code %v and format %v from file %v", code, HTML, file)
-	tmpl := template.Must(template.ParseFiles(f.Name(), styles.Name()))
+	data := newErrorPageData(r, code, messages)
+	err = templates.ExecuteTemplate(buf, "index", data)
+	if err != nil {
+		log.Error().Msgf("Failed to execute template %s", err)
+		w.Header().Set(ContentType, JSON)
+		w.WriteHeader(http.StatusInternalServerError)
+		body, _ := json.Marshal(newErrorPageData(r, http.StatusInternalServerError,
+			[]string{"Ups, this should not have happened", "Failed to execute templates"}))
+		w.Write(body)
+		return
+	}
 
 	w.Header().Set(ContentType, HTML)
 	w.WriteHeader(code)
-
-	data := newErrorPageData(r, message)
-	tmpl.Execute(w, data)
+	buf.WriteTo(w)
 }
 
-// JSONResponse returns json reponse
-func JSONResponse(w http.ResponseWriter, r *http.Request) {
+// jsonResponse returns json reponse
+func jsonResponse(w http.ResponseWriter, r *http.Request) {
 	code := getStatusCode(r)
-	message := getMessage(code)
+	message := getMessages(code)
+
+	body, err := json.Marshal(newErrorPageData(r, code, message))
+	if err != nil {
+		log.Error().Msgf("Failed to marshal json response %s", err)
+		w.Header().Set(ContentType, JSON)
+		w.WriteHeader(http.StatusInternalServerError)
+		body, _ := json.Marshal(newErrorPageData(r, http.StatusInternalServerError,
+			[]string{"Ups, this should not have happened", "Failed to marshal json response"}))
+		w.Write(body)
+		return
+	}
 
 	w.Header().Set(ContentType, JSON)
 	w.WriteHeader(code)
-	body, _ := json.Marshal(newErrorPageData(r, message))
 	w.Write(body)
 }
 
-// ServeHttp error handler
-func (opts *Options) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	start := time.Now()
-	format := getFormat(r)
+// ErrorPage error handler
+func ErrorPage() http.Handler {
+	return metrics.Measure(errorPage())
+}
 
-	switch format {
-	case JSON:
-		JSONResponse(w, r)
-	default:
-		HTMLResponse(w, r, opts.ErrFilesPath)
+func errorPage() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		format := getFormat(r)
+
+		switch format {
+		case JSON:
+			jsonResponse(w, r)
+		default:
+			htmlResponse(w, r)
+		}
 	}
-
-	duration := time.Now().Sub(start).Seconds()
-
-	proto := strconv.Itoa(r.ProtoMajor)
-	proto = fmt.Sprintf("%s.%s", proto, strconv.Itoa(r.ProtoMinor))
-
-	requestCount.WithLabelValues(proto).Inc()
-	requestDuration.WithLabelValues(proto).Observe(duration)
+	return http.HandlerFunc(fn)
 }
