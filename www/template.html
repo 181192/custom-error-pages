@@ -4,8 +4,8 @@
 </head>
 <body>
   <h1>{{ .Code }} - {{ .Title }}</h1>
-  {{- range .Message }}
-  <p class="zoom-area">{{ . }}</p>
+  {{- if .Message }}
+  <p class="zoom-area">{{ .Message }}</p>
   {{- end }}
   <section class="error-container">
   <span><span>{{ slice .Code 0 1 }}</span></span>
