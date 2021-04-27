@@ -45,7 +45,7 @@ dockers:
       - --label=org.opencontainers.image.licenses=MIT
     extra_files:
       - etc
-      - www
+      - themes
   - goos: linux
     goarch: arm
     goarm: "6"
@@ -67,7 +67,7 @@ dockers:
       - --label=org.opencontainers.image.licenses=MIT
     extra_files:
       - etc
-      - www
+      - themes
   - goos: linux
     goarch: arm64
     ids:
@@ -88,7 +88,7 @@ dockers:
       - --label=org.opencontainers.image.licenses=MIT
     extra_files:
       - etc
-      - www
+      - themes
 docker_manifests:
   - name_template: ghcr.io/181192/custom-error-pages:{{ .Version }}
     image_templates:

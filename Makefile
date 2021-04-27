@@ -16,7 +16,7 @@ install:
 
 ## run: Runs the application.
 run:
-	ERROR_FILES_PATH=$(CURRENT)/www go run ./
+	ERROR_FILES_PATH=$(CURRENT)/themes/knockout go run ./
 
 ## build: Builds the project.
 build: main.go
