@@ -1,0 +1,22 @@
+{{ define "styles" }}
+html, body {
+  margin: 0;
+  background-color: #222;
+  color: #aaa;
+  font-family: 'Hack', monospace
+}
+
+.full-height {
+  height: 100vh
+}
+
+.flex-center {
+  align-items: center;
+  display: flex;
+  justify-content: center
+}
+
+#error_text {
+  font-size: 2em
+}
+{{ end }}

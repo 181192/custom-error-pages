@@ -1,9 +1,9 @@
 FROM scratch
 
 COPY etc etc
-COPY www www
+COPY themes themes
 COPY custom-error-pages /
 
-ENV ERROR_FILES_PATH /www
+ENV ERROR_FILES_PATH /themes/knockout
 
 CMD ["/custom-error-pages"]

@@ -1,0 +1,64 @@
+{{ define "index" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{{ .Code }} - {{ .Title }}</title>
+    <style>{{ template "styles" }}</style>
+</head>
+<body>
+
+<div class="container-center">
+    <div>
+        <h1>{{ .Code }}</h1>
+        <h2>{{ .Title }}</h2>
+    </div>
+</div>
+
+<div class="frame">
+    <div></div>
+    <div></div>
+    <div></div>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+    // main idea author: https://codepen.io/moklick
+
+    const $canvas = document.getElementById('canvas'),
+        width = Math.max(800, document.body.clientWidth),
+        height = Math.max(600, document.body.clientHeight);
+
+    $canvas.width = width;
+    $canvas.height = height;
+
+    const ctx = $canvas.getContext('2d');
+
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, width, height);
+    ctx.fill();
+
+    const imgData = ctx.getImageData(0, 0, width, height), pix = imgData.data;
+
+    const flickerInterval = window.setInterval(function () {
+        for (let i = 0; i < pix.length; i += 4) {
+            let color = (Math.random() * 255) + 50;
+            pix[i] = color;
+            pix[i + 1] = color;
+            pix[i + 2] = color;
+        }
+
+        ctx.putImageData(imgData, 0, 0);
+    }, 45);
+
+    window.addEventListener('beforeunload', function (/** @param BeforeUnloadEvent event */ event) {
+        window.clearInterval(flickerInterval);
+    });
+</script>
+</body>
+</html>
+{{ end }}

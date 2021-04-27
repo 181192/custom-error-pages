@@ -30,7 +30,7 @@ func InitFlags() {
 	pflag.Bool(Debug, false, "enable debug log")
 	pflag.Bool(LogColor, false, "sets log format to human-friendly, colorized output")
 	pflag.String(HTTPListenAddress, ":8080", "http server address")
-	pflag.String(ErrFilesPath, "./www", "the location on disk of files served by the handler")
+	pflag.String(ErrFilesPath, "./themes/knockout", "the location on disk of files served by the handler")
 	pflag.Bool(HideDetails, false, "hide request details in response")
 
 	pflag.Parse()
