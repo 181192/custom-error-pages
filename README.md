@@ -87,9 +87,9 @@ defaultBackend:
     repository: ghcr.io/181192/custom-error-pages
     tag: latest
   # optional: change path to theme
-  extraEnv:
+  extraEnvs:
   - name: ERROR_FILES_PATH
-    value: knockout
+    value: ./themes/knockout
 ```
 
 ## Getting started - Kustomize
