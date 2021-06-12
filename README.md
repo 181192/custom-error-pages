@@ -94,10 +94,12 @@ defaultBackend:
 
 ## Getting started - Kustomize
 
-Kustomize manifest are provided with both ingress controller and default backend deployment
+Kustomize manifest are provided with both ingress controller and default backend deployment.
 
 ```bash
-kubectl apply -f k8s/
+kubectl apply -k k8s/
+Or
+kustomize build k8s | kubectl apply -f -
 ```
 
 ## Credits
