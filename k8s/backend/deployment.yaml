@@ -10,6 +10,9 @@ spec:
         - name: ingress-nginx-default-backend
           image: ghcr.io/181192/custom-error-pages
           imagePullPolicy: IfNotPresent
+          env: 
+            - name: ERROR_FILES_PATH
+              value: ./themes/knockout
           securityContext:
             runAsUser: 65534
           ports:
