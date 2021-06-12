@@ -21,6 +21,7 @@ spec:
           args:
             - /nginx-ingress-controller
             - --configmap=$(POD_NAMESPACE)/$(NGINX_CONFIGMAP_NAME)
+            - --default-backend-service=$(POD_NAMESPACE)/ingress-nginx-default-backend
             - --publish-service=$(POD_NAMESPACE)/$(SERVICE_NAME)
             - --election-id=ingress-controller-leader
             - --ingress-class=nginx
